@@ -303,13 +303,30 @@
       // Get the inner text, prefer innerText for rendered output
       let rawText = (node.innerText || node.textContent || '').trim();
 
-      // Strip Gemini's hidden screen-reader text
-      rawText = rawText.replace(/^(?:You said|Gemini said)[:\s]*/i, '');
+      // Strip Gemini's hidden screen-reader text anywhere in the message
+      rawText = rawText.replace(/(?:You said|Gemini said)[:\s]*/ig, '');
 
       if (!rawText || rawText.length < 2) return;
 
       const classification = classifyMessage(rawText, role);
       const title = generateTitle(rawText);
+
+      // Extract subpoints (Table of Contents) from AI responses
+      const subpoints = [];
+      if (role === 'assistant') {
+        const headings = node.querySelectorAll('h2, h3, h4, li > strong:first-child');
+        headings.forEach(h => {
+          // If it's a strong tag inside a list, we might want the parent list text if it's short, 
+          // but the bold part itself is usually a perfect, concise TOC header!
+          let t = (h.innerText || '').trim();
+          // specifically strip bullet chars
+          t = t.replace(/^[\-\*•\d\.]+\s*/, '');
+          
+          if (t && t.length > 2 && t.length < 45) {
+            subpoints.push({ text: t, node: h });
+          }
+        });
+      }
 
       extractedItems.push({
         node,
@@ -317,6 +334,7 @@
         rawText,   // store full text for hover preview
         role,
         index,
+        subpoints, // store subpoints
         ...classification,
       });
 
@@ -421,6 +439,42 @@
 
     textBlock.appendChild(titleSpan);
     textBlock.appendChild(metaSpan);
+
+    // Render Subpoints if they exist (Table of Contents)
+    if (item.subpoints && item.subpoints.length > 0) {
+      const subList = document.createElement('div');
+      subList.className = 'tp-subpoints';
+
+      const icon = document.createElement('span');
+      icon.className = 'tp-subpoints-icon';
+      icon.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 10 4 15 9 20"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/></svg>`;
+      subList.appendChild(icon);
+
+      item.subpoints.slice(0, 6).forEach((sp, i, arr) => {
+        const spEl = document.createElement('span');
+        spEl.className = 'tp-subpoint-item';
+        spEl.textContent = sp.text;
+        spEl.title = sp.text;
+
+        spEl.addEventListener('click', (e) => {
+          e.stopPropagation(); // prevent clicking the parent item
+          scrollToMessage({ node: sp.node }); // reuse scroll logic
+          markActive(el);
+          hidePreview();
+        });
+
+        subList.appendChild(spEl);
+
+        if (i < arr.length - 1) {
+          const sep = document.createElement('span');
+          sep.className = 'tp-subpoint-sep';
+          sep.textContent = '·';
+          subList.appendChild(sep);
+        }
+      });
+
+      textBlock.appendChild(subList);
+    }
 
     // Star button
     const starBtn = document.createElement('button');

@@ -517,6 +517,46 @@ body[data-tp-theme="light"] #tp-toast {
   letter-spacing: 0.01em;
 }
 
+/* ── Subpoints (Table of Contents) ──────────────────────────── */
+.tp-subpoints {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+}
+
+.tp-subpoints-icon {
+  color: var(--tp-text-dim);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
+.tp-subpoint-item {
+  font-size: 10px;
+  color: var(--tp-text-muted);
+  cursor: pointer;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+
+.tp-subpoint-item:hover {
+  color: var(--tp-accent);
+  text-decoration: underline;
+}
+
+.tp-subpoint-sep {
+  color: var(--tp-border);
+  font-size: 10px;
+  flex-shrink: 0;
+  cursor: default;
+}
+
 /* ── Empty State ────────────────────────────────────────────── */
 .tp-empty {
   text-align: center;
