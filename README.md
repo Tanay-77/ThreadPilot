@@ -4,7 +4,7 @@
 
 ThreadPilot is a Chrome extension that automatically indexes your long AI conversations and generates a clean, interactive sidebar. It extracts your prompts and the AI's responses, letting you jump to any specific message instantly without endless scrolling.
 
-![alt text](image-1.png)
+![alt text](image-1.png)  ![alt text](image-2.png)
 ## Features
 
 - **Universal Support:** Works seamlessly across ChatGPT, Google Gemini, and Anthropic Claude.
